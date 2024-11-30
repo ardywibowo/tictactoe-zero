@@ -1,1 +1,3 @@
-# tictactoe-zero
+# TicTacToe Zero
+
+AlphaZero but for TicTacToe.
