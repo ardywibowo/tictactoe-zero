@@ -4,6 +4,7 @@ import math
 class Node:
     def __init__(self, parent):
         self.parent = parent
+        self.player = 1 if not parent else -parent.player
         self.children = {}
         self.visits = 0
         self.value = 0
@@ -17,15 +18,18 @@ class Node:
             key=lambda x: (x[1].value / x[1].visits + math.sqrt(2 * math.log(self.visits) / x[1].visits) if x[1].visits > 0 else float('inf'))
         )
     
+    def mean_value(self):
+        return self.value / self.visits if self.visits > 0 else 0
+    
     def expand(self, env):
         for move in env.valid_moves:
             self.children[move] = Node(self)
     
-    def update(self, value):
+    def update(self, reward):
         node = self
         while node:
             node.visits += 1
-            node.value += value
+            node.value += reward * node.player
             node = node.parent
 
 def search(root: Optional[Node], env, num_simulations):

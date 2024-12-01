@@ -1,5 +1,6 @@
 from game import TicTacToe
-from mcts import search
+from mcts import Node, search
+from collections import deque
 
 def main():
     print("Hello, World!")
