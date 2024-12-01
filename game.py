@@ -28,10 +28,11 @@ class TicTacToe:
         
         observation = self.board.copy()
         if self.board[x][y] != 0:
-            reward = -1
+            print('Invalid move:', action)
+            reward = -10
             terminated = True
             truncated = True
-            return observation, -10, terminated, truncated
+            return observation, reward, terminated, truncated
         
         self.board[x][y] = self.player
         self.valid_moves.remove((x, y))
@@ -45,14 +46,14 @@ class TicTacToe:
     def check_winner(self):
         for i in range(3):
             if self.board[i][0] == self.board[i][1] == self.board[i][2] != 0:
-                return self.board[i][0]
+                return 1
             if self.board[0][i] == self.board[1][i] == self.board[2][i] != 0:
-                return self.board[0][i]
+                return 1
         
         if self.board[0][0] == self.board[1][1] == self.board[2][2] != 0:
-            return self.board[0][0]
+            return 1
         if self.board[0][2] == self.board[1][1] == self.board[2][0] != 0:
-            return self.board[0][2]
+            return 1
         
         return 0
 

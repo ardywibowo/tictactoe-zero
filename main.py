@@ -1,13 +1,11 @@
 from game import TicTacToe
-from mcts import Node, search
-from collections import deque
+from mcts import search, play
 
 def main():
-    print("Hello, World!")
-    
     env = TicTacToe()
-    root = search(None, env, 10000)
-
+    root = search(None, env, 1000000)
+    while True:
+        play(root, env)
 
 if __name__ == "__main__":
     main()

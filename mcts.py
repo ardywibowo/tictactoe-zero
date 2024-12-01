@@ -9,13 +9,18 @@ class Node:
         self.visits = 0
         self.value = 0
     
-    def select_child(self):
+    def select_child(self, env):
         if not self.children:
             return None
         
+        move_node = list((move, node) for move, node in self.children.items() if move in env.valid_moves)
+        
         return max(
-            self.children.items(), 
-            key=lambda x: (x[1].value / x[1].visits + math.sqrt(2 * math.log(self.visits) / x[1].visits) if x[1].visits > 0 else float('inf'))
+            move_node, 
+            key = lambda x: (
+                x[1].value / x[1].visits + 
+                math.sqrt(2 * math.log(self.visits) / x[1].visits) if x[1].visits > 0 else float('inf')
+            )
         )
     
     def mean_value(self):
@@ -29,7 +34,8 @@ class Node:
         node = self
         while node:
             node.visits += 1
-            node.value += reward * node.player
+            node.value += reward
+            reward *= -1
             node = node.parent
 
 def search(root: Optional[Node], env, num_simulations):
@@ -43,11 +49,11 @@ def search(root: Optional[Node], env, num_simulations):
         while not terminated and not truncated:
             if not node.children:
                 node.expand(env)
-                move, node = node.select_child()
+                move, node = node.select_child(env)
                 observation, reward, terminated, truncated = env.step(move)
                 break
             else:
-                move, node = node.select_child()
+                move, node = node.select_child(env)
                 observation, reward, terminated, truncated = env.step(move)
         
         # Rollout
@@ -58,3 +64,31 @@ def search(root: Optional[Node], env, num_simulations):
         node.update(reward)
     
     return root
+
+def play(root: Node, env):
+    node = root
+    env.reset()
+    while True:
+        move, node = node.select_child(env)
+        
+        print('AI move:', move, node.mean_value())
+        observation, reward, terminated, truncated = env.step(move)
+        env.print_board()
+        if terminated:
+            break
+        
+        move = tuple(map(int, input('Enter move: ').split()))
+        observation, reward, terminated, truncated = env.step(move)
+        node = node.children[move]
+        print('Player move:', move, node.mean_value())
+        env.print_board()
+        if terminated:
+            break
+        
+        if truncated:
+            print('Game truncated')
+            break
+    
+    print('Winner:', 'O' if reward == 1 else 'X' if reward == -1 else 'None')
+    
+    return env.check_winner()
